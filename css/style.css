@@ -3,14 +3,29 @@
 html, body, #app { height: 100%; font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif; }
 body { background: #f0f2f5; color: #303133; }
 
+/* dvh 单位解决手机地址栏动态高度抖动（不支持 dvh 的旧浏览器回退 vh） */
+.main-layout, .login-container {
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* 刘海屏 / 全面屏安全区 */
+@supports (padding: env(safe-area-inset-top)) {
+  .top-bar { padding-top: calc(env(safe-area-inset-top) + 0); }
+  body { padding-bottom: env(safe-area-inset-bottom); }
+}
+
 /* ========== 登录页 ========== */
 .login-container {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex; align-items: center; justify-content: center;
   background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  padding: 16px;
 }
 .login-card {
-  width: 400px; padding: 40px; background: #fff; border-radius: 12px;
+  width: 400px; max-width: calc(100vw - 32px);
+  padding: 40px; background: #fff; border-radius: 12px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.2);
 }
 .login-title { text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 8px; color: #1890ff; }
@@ -91,19 +106,107 @@ body { background: #f0f2f5; color: #303133; }
 /* ========== 响应式 ========== */
 @media (max-width: 1024px) {
   .chart-row { grid-template-columns: 1fr; }
-}
-@media (max-width: 768px) {
-  .sidebar { width: 64px; }
-  .sidebar .sidebar-logo span:not(.logo-icon),
-  .sidebar-menu .el-menu-item span,
-  .sidebar-menu .el-sub-menu__title span:not(.el-icon) { display: none; }
-  .chart-row { grid-template-columns: 1fr; }
-  .stat-cards { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+  .stat-cards { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
 }
 
-/* ========== 打印样式 ========== */
+/* ---- 平板 + 手机 (≤768px) 抽屉式侧边栏 ---- */
+@media (max-width: 768px) {
+  .main-layout { position: relative; }
+
+  /* 隐藏固定侧边栏，改用抽屉 */
+  .sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: 220px; z-index: 2000;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 4px 0 16px rgba(0,0,0,0.2);
+  }
+  .sidebar.mobile-open { transform: translateX(0); }
+
+  /* 遮罩层 */
+  .sidebar-mask {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+    z-index: 1999; opacity: 0; pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .sidebar-mask.show { opacity: 1; pointer-events: auto; }
+
+  /* 汉堡按钮 */
+  .hamburger-btn {
+    display: inline-flex !important;
+    align-items: center; justify-content: center;
+    width: 36px; height: 36px; border: none; background: transparent;
+    font-size: 20px; cursor: pointer; border-radius: 6px;
+    margin-right: 8px; color: #303133;
+  }
+  .hamburger-btn:active { background: rgba(0,0,0,0.06); }
+
+  /* 恢复菜单文字显示（抽屉里要完整） */
+  .sidebar .sidebar-logo span:not(.logo-icon),
+  .sidebar-menu .el-menu-item span,
+  .sidebar-menu .el-sub-menu__title span:not(.el-icon) { display: inline; }
+
+  /* 右侧内容区占满 */
+  .main-content { margin-left: 0 !important; }
+
+  /* 顶栏 */
+  .top-bar { height: 50px; padding: 0 12px; }
+  .chart-row { grid-template-columns: 1fr; }
+  .page-container { padding: 12px; }
+
+  /* 统计卡片 */
+  .stat-cards { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+
+  /* 表格 —— 强制横向滚动 */
+  .el-table { display: block; overflow-x: auto; white-space: nowrap; }
+  .el-table .el-table__header-wrapper,
+  .el-table .el-table__body-wrapper { overflow-x: auto !important; }
+
+  /* 弹窗 —— 占满屏幕 */
+  .el-dialog { width: calc(100vw - 24px) !important; margin: 12px auto !important; }
+  .el-dialog__body { max-height: 60vh; overflow-y: auto; }
+}
+
+/* ---- 小屏手机 (≤480px) 更激进的缩小 ---- */
+@media (max-width: 480px) {
+  .top-bar { height: 48px; padding: 0 8px; }
+  .top-bar .breadcrumb { font-size: 12px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .top-bar .user-name { display: none; }
+  .top-bar .el-tag { display: none; }
+  .top-bar .el-avatar { width: 28px; height: 28px; font-size: 12px; }
+
+  .page-container { padding: 10px; }
+  .page-card { padding: 14px; border-radius: 6px; }
+  .page-title { font-size: 16px; margin-bottom: 12px; }
+
+  /* 统计卡片固定两列 */
+  .stat-cards { grid-template-columns: repeat(2, 1fr); }
+  .stat-card { padding: 14px; border-radius: 6px; }
+  .stat-card .stat-icon { width: 42px; height: 42px; font-size: 22px; margin-right: 12px; border-radius: 10px; }
+  .stat-card .stat-info .stat-value { font-size: 22px; }
+  .stat-card .stat-info .stat-label { font-size: 12px; }
+
+  .toolbar { gap: 8px; }
+  .toolbar .search-area { width: 100%; flex-wrap: wrap; }
+  .toolbar .search-area .el-input { flex: 1; min-width: 100px; }
+
+  .chart-box { height: 240px; }
+
+  .el-dialog { width: calc(100vw - 16px) !important; margin: 8px auto !important; }
+  .el-dialog__header { padding: 12px 16px; }
+  .el-dialog__body { padding: 12px 16px; }
+  .el-dialog__footer { padding: 10px 16px; }
+
+  /* Element Plus 栅格列全宽 */
+  .el-row .el-col { flex: 0 0 100%; max-width: 100%; }
+
+  /* 下拉 / 弹出层限制 */
+  .el-select-dropdown, .el-date-editor, .el-picker-panel { max-width: calc(100vw - 16px); }
+}
+
+/* 打印样式 */
 @media print {
-  .sidebar, .top-bar, .toolbar, .no-print { display: none !important; }
+  .sidebar, .top-bar, .toolbar, .no-print, .hamburger-btn, .sidebar-mask { display: none !important; }
   .page-container { padding: 0; }
   body { background: #fff; }
 }

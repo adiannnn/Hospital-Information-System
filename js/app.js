@@ -2,10 +2,31 @@
  * 主应用入口 - 包含全局布局（侧边栏 + 顶部栏 + 路由视图）
  */
 const App = {
+  data() {
+    return {
+      sidebarOpen: false,
+      isMobile: window.innerWidth <= 768
+    };
+  },
+  mounted() {
+    window.addEventListener('resize', this.handleResize);
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.handleResize);
+  },
+  watch: {
+    '$route'() {
+      // 切换页面时自动关闭侧边栏（移动端）
+      if (this.isMobile) this.sidebarOpen = false;
+    }
+  },
   template: `
     <div class="main-layout">
+      <!-- 遮罩层（仅手机端显示） -->
+      <div v-if="isMobile" class="sidebar-mask" :class="{ show: sidebarOpen }" @click="sidebarOpen = false"></div>
+
       <!-- 侧边栏 -->
-      <aside class="sidebar">
+      <aside class="sidebar" :class="{ 'mobile-open': sidebarOpen }">
         <div class="sidebar-logo">
           <el-icon class="logo-icon"><FirstAidKit /></el-icon>
           <span>智慧HIS</span>
@@ -73,11 +94,17 @@ const App = {
       <!-- 右侧内容区 -->
       <div class="main-content">
         <div class="top-bar">
-          <div class="breadcrumb">
-            <el-breadcrumb separator="/">
-              <el-breadcrumb-item :to="{ path: '/dashboard' }">首页</el-breadcrumb-item>
-              <el-breadcrumb-item>{{ currentTitle }}</el-breadcrumb-item>
-            </el-breadcrumb>
+          <div style="display:flex;align-items:center;">
+            <!-- 汉堡按钮（仅手机端） -->
+            <button v-if="isMobile" class="hamburger-btn" @click="sidebarOpen = !sidebarOpen" aria-label="菜单">
+              <el-icon><Menu /></el-icon>
+            </button>
+            <div class="breadcrumb">
+              <el-breadcrumb separator="/">
+                <el-breadcrumb-item :to="{ path: '/dashboard' }">首页</el-breadcrumb-item>
+                <el-breadcrumb-item>{{ currentTitle }}</el-breadcrumb-item>
+              </el-breadcrumb>
+            </div>
           </div>
           <div class="user-info">
             <el-tag type="success" effect="light">管理员</el-tag>
@@ -116,6 +143,10 @@ const App = {
     }
   },
   methods: {
+    handleResize() {
+      this.isMobile = window.innerWidth <= 768;
+      if (!this.isMobile) this.sidebarOpen = false;
+    },
     resetData() {
       this.$confirm('确定要重置所有演示数据吗？这将恢复到初始 Mock 数据。', '提示', {
         confirmButtonText: '确定',

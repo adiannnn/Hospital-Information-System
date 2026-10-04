@@ -2,9 +2,10 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
   <title>智慧医院信息系统</title>
-  <link rel="stylesheet" href="https://unpkg.com/element-plus@2.4.4/dist/index.css" />
+  <!-- 全部本地依赖，GitHub Pages 部署后零外部请求 -->
+  <link rel="stylesheet" href="vendor/element-plus.css" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -16,14 +17,14 @@
     </router-view>
   </div>
 
-  <!-- 核心框架 CDN -->
-  <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
-  <script src="https://unpkg.com/vue-router@4.3.0/dist/vue-router.global.prod.js"></script>
-  <script src="https://unpkg.com/element-plus@2.4.4/dist/index.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/index.iife.min.js"></script>
-  <script src="https://unpkg.com/echarts@5.5.0/dist/echarts.min.js"></script>
+  <!-- 核心框架（已下载到本地 vendor/） -->
+  <script src="vendor/vue.global.prod.js"></script>
+  <script src="vendor/vue-router.global.prod.js"></script>
+  <script src="vendor/element-plus.js"></script>
+  <script src="vendor/element-plus-icons.js"></script>
+  <script src="vendor/echarts.min.js"></script>
 
-  <!-- 业务代码：数据层 → 所有视图 → 路由 → 主应用 -->
+  <!-- 业务代码 -->
   <script src="js/data.js"></script>
   <script src="js/views/dashboard.js"></script>
   <script src="js/views/departments.js"></script>
