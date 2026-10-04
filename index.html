@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>智慧医院信息系统</title>
+  <link rel="stylesheet" href="https://unpkg.com/element-plus@2.4.4/dist/index.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <router-view v-slot="{ Component }">
+      <transition name="fade" mode="out-in">
+        <component :is="Component" />
+      </transition>
+    </router-view>
+  </div>
+
+  <!-- 核心框架 CDN -->
+  <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+  <script src="https://unpkg.com/vue-router@4.3.0/dist/vue-router.global.prod.js"></script>
+  <script src="https://unpkg.com/element-plus@2.4.4/dist/index.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/index.iife.min.js"></script>
+  <script src="https://unpkg.com/echarts@5.5.0/dist/echarts.min.js"></script>
+
+  <!-- 业务代码：数据层 → 所有视图 → 路由 → 主应用 -->
+  <script src="js/data.js"></script>
+  <script src="js/views/dashboard.js"></script>
+  <script src="js/views/departments.js"></script>
+  <script src="js/views/doctors.js"></script>
+  <script src="js/views/patients.js"></script>
+  <script src="js/views/appointments.js"></script>
+  <script src="js/views/emr.js"></script>
+  <script src="js/views/prescriptions.js"></script>
+  <script src="js/views/pharmacy.js"></script>
+  <script src="js/views/billing.js"></script>
+  <script src="js/views/lab.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
